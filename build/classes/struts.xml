@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+	"-//Apache Software Foundation//DTD Struts Configuration 2.3//EN"
+	"http://struts.apache.org/dtds/struts-2.3.dtd">
+
+<struts>
+	<constant name="struts.action.extension" value="action,do,html"></constant>
+	<constant name="struts.configuration.xml.reload" value="true"></constant>
+	<constant name="struts.multipart.maxSize" value="10240000"></constant>
+	<constant name="struts.custom.i18n.resources" value="Message"></constant>
+	<constant name="struts.objectFactory" value="org.apache.struts2.spring.StrutsSpringObjectFactory" />
+    <!-- 表示action由spring进行创建，可以使用spring的依赖注入-->
+    <package name="default" namespace="/" extends="struts-default">
+    <interceptors>
+    <interceptor name="myInterceptor" class="org.lee.spring.hibernate.intecitor.UserInterceptor"></interceptor>
+    	<interceptor-stack name="myStack">
+    		<interceptor-ref name="defaultStack"></interceptor-ref>
+    		<interceptor-ref name="myInterceptor"></interceptor-ref>
+    	</interceptor-stack>
+    </interceptors>
+        <global-results>
+    		<result name="error">/WEB-INF/jsp/inc/error.jsp</result>
+    		<result name="exception">/WEB-INF/jsp/inc/exception.jsp</result>
+    		<result name="Login" type="redirect">/loginInput.do</result>
+    	</global-results>
+    <global-exception-mappings >
+    	<exception-mapping result="exception" exception="org.lee.spring.hibernate.model.LibException"></exception-mapping>
+    </global-exception-mappings>
+		<action name="*_*" class="{1}Action" method="{2}">
+		<interceptor-ref name="myStack"></interceptor-ref>
+			<result name="success">/WEB-INF/jsp/{1}/{2}.jsp</result>
+			<result type="redirect" name="redirect">${url}</result>
+			<result name="input">/WEB-INF/jsp/{1}/{2}Input.jsp</result>
+		</action>
+		<action name="loginInput" class="loginAction" method="loginInput">
+			<result name="loginInput">/WEB-INF/jsp/login.jsp</result>
+		</action>
+		<action name="login" class="loginAction" method="login">
+			<result name="login" type="redirect">${url}</result>
+			<result name="bad">/WEB-INF/jsp/login.jsp</result>
+		</action>
+		<action name="logOut" class="loginAction" method="logOut">
+			<result name="logOut" type="redirect">/loginInput.do</result>
+		</action>
+    </package>
+</struts>
